@@ -4,79 +4,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-import { IAdapter, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base";
-import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
-import { getDefaultExternalAdapters } from "@web3auth/default-evm-adapter";
-import { Web3Auth, Web3AuthOptions } from "@web3auth/modal";
-import { AuthAdapter } from "@web3auth/auth-adapter";
-import { web3AuthChainConfig, web3AuthClientId } from "@/contracts/config";
-
-const privateKeyProvider = new EthereumPrivateKeyProvider({
-  config: { chainConfig: web3AuthChainConfig },
-});
-
-const web3AuthOptions: Web3AuthOptions = {
-  clientId: web3AuthClientId,
-  web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-  privateKeyProvider,
-};
-const web3auth = new Web3Auth(web3AuthOptions);
+import { useWeb3Auth } from "@web3auth/modal-react-hooks";
 
 export default function Header() {
-  const [provider, setProvider] = useState<IProvider | null>(null);
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const adapters = await getDefaultExternalAdapters({
-          options: web3AuthOptions,
-        });
-        adapters.forEach((adapter: IAdapter<unknown>) => {
-          web3auth.configureAdapter(adapter);
-        });
-        // configure worldcoin adapter
-        const worldcoinAuthAdapter = new AuthAdapter({
-          adapterSettings: {
-            loginConfig: {
-              jwt: {
-                verifier: "web3auth-worldcoin-verifier", // Pass the Verifier name here
-                typeOfLogin: "jwt", // Pass on the login provider of the verifier you've created
-                clientId: "ZhzsfLjlf8FT2l7syQpDtmCpROld8oLg", // Pass on the Auth0 `Client ID` here
-              },
-            },
-          },
-        });
-        web3auth.configureAdapter(worldcoinAuthAdapter);
-
-        await web3auth.initModal();
-        setProvider(web3auth.provider);
-
-        if (web3auth.connected) {
-          setLoggedIn(true);
-        }
-      } catch (error) {
-        // DO NOTHING
-        console.log(error);
-      }
-    };
-
-    init();
-  }, []);
-
-  const login = async () => {
-    const web3authProvider = await web3auth.connect();
-    setProvider(web3authProvider);
-    if (web3auth.connected) {
-      setLoggedIn(true);
-    }
-  };
-
-  const getUserInfo = async () => {
-    return await web3auth.getUserInfo();
-  };
+  const { userInfo, connect, logout, isConnected } = useWeb3Auth();
 
   return (
     <div className="bg-white">
@@ -95,24 +26,28 @@ export default function Header() {
 
         {/* USER DATA AND PROFILE */}
         <div className="pr-5 flex items-center gap-x-2">
-          {loggedIn ? (
+          {isConnected ? (
             <>
               <button
                 onClick={() => {
-                  web3auth.logout();
-                  setLoggedIn(false);
+                  logout();
                 }}
                 className="text-white bg-blue-400 rounded px-3 py-1"
               >
-                {}
-                Logout
+                Hello {userInfo?.name} Logout
               </button>
-              <button>Profile</button>
+
+              <a
+                href="/profile"
+                className="text-white bg-blue-400 rounded px-3 py-1"
+              >
+                Profile
+              </a>
             </>
           ) : (
             <>
               <button
-                onClick={login}
+                onClick={connect}
                 className="text-white bg-blue-400 rounded px-3 py-1"
               >
                 Web3
