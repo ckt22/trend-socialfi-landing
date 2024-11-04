@@ -10,6 +10,7 @@ import { IAdapter, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { getDefaultExternalAdapters } from "@web3auth/default-evm-adapter";
 import { Web3Auth, Web3AuthOptions } from "@web3auth/modal";
+import { AuthAdapter } from "@web3auth/auth-adapter";
 import { web3AuthChainConfig, web3AuthClientId } from "@/contracts/config";
 
 const privateKeyProvider = new EthereumPrivateKeyProvider({
@@ -18,7 +19,7 @@ const privateKeyProvider = new EthereumPrivateKeyProvider({
 
 const web3AuthOptions: Web3AuthOptions = {
   clientId: web3AuthClientId,
-  web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+  web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
   privateKeyProvider,
 };
 const web3auth = new Web3Auth(web3AuthOptions);
@@ -36,6 +37,20 @@ export default function Header() {
         adapters.forEach((adapter: IAdapter<unknown>) => {
           web3auth.configureAdapter(adapter);
         });
+        // configure worldcoin adapter
+        const worldcoinAuthAdapter = new AuthAdapter({
+          adapterSettings: {
+            loginConfig: {
+              jwt: {
+                verifier: "web3auth-worldcoin-verifier", // Pass the Verifier name here
+                typeOfLogin: "jwt", // Pass on the login provider of the verifier you've created
+                clientId: "ZhzsfLjlf8FT2l7syQpDtmCpROld8oLg", // Pass on the Auth0 `Client ID` here
+              },
+            },
+          },
+        });
+        web3auth.configureAdapter(worldcoinAuthAdapter);
+
         await web3auth.initModal();
         setProvider(web3auth.provider);
 
@@ -43,7 +58,8 @@ export default function Header() {
           setLoggedIn(true);
         }
       } catch (error) {
-        console.error(error);
+        // DO NOTHING
+        console.log(error);
       }
     };
 
@@ -58,6 +74,10 @@ export default function Header() {
     }
   };
 
+  const getUserInfo = async () => {
+    return await web3auth.getUserInfo();
+  };
+
   return (
     <div className="bg-white">
       {/* HEADER */}
@@ -69,18 +89,36 @@ export default function Header() {
         {/* NAVIGATIONS */}
         <div className="flex items-center space-between gap-x-5">
           <Link href="/">Questions</Link>
-          <Link href="/">Questions</Link>
+          <Link href="/">Results</Link>
           <Link href="/">Leaderboard</Link>
         </div>
+
         {/* USER DATA AND PROFILE */}
         <div className="pr-5 flex items-center gap-x-2">
-          <button
-            onClick={login}
-            className="text-white bg-blue-400 rounded px-3 py-1"
-          >
-            Web3
-          </button>
-          <button>Profile</button>
+          {loggedIn ? (
+            <>
+              <button
+                onClick={() => {
+                  web3auth.logout();
+                  setLoggedIn(false);
+                }}
+                className="text-white bg-blue-400 rounded px-3 py-1"
+              >
+                {}
+                Logout
+              </button>
+              <button>Profile</button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={login}
+                className="text-white bg-blue-400 rounded px-3 py-1"
+              >
+                Web3
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

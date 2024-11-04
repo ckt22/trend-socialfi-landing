@@ -15,13 +15,12 @@ export const web3AuthClientId =
 
 export const web3AuthChainConfig = {
   chainNamespace: CHAIN_NAMESPACES.EIP155,
-  chainId: "0xaa36a7",
-  rpcTarget: "https://rpc.ankr.com/eth_sepolia",
+  chainId: "0x1", // Please use 0x1 for Ethereum Mainnet
+  rpcTarget: "https://rpc.ankr.com/eth",
   // Avoid using public rpcTarget in production.
   // Use services like Infura, Quicknode etc
-  displayName: "Ethereum Sepolia Testnet",
-  blockExplorerUrl: "https://sepolia.etherscan.io",
+  displayName: "Ethereum Mainnet",
+  blockExplorerUrl: "https://etherscan.io/",
   ticker: "ETH",
   tickerName: "Ethereum",
-  logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
 };
