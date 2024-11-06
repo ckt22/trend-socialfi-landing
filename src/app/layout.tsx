@@ -6,8 +6,13 @@ import Layout from "@/components/Layouts";
 const circular = localFont({
   src: [
     {
+      path: "./fonts/3MCircularTT-Light.ttf",
+      weight: "100 400",
+      style: "normal",
+    },
+    {
       path: "./fonts/3MCircularTT-Regular.ttf",
-      weight: "100 600",
+      weight: "400 600",
       style: "normal",
     },
     {

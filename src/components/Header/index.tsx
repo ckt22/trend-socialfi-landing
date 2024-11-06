@@ -4,13 +4,30 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useWeb3Auth } from "@web3auth/modal-react-hooks";
+
+const paths = [
+  {
+    path: "/",
+    name: "Questions",
+  },
+  {
+    path: "/results",
+    name: "Results",
+  },
+  {
+    path: "/leaderboard",
+    name: "Leaderboard",
+  },
+];
 
 export default function Header() {
   const { userInfo, connect, logout, isConnected } = useWeb3Auth();
+  const pathname = usePathname();
 
   return (
-    <div className="bg-white">
+    <div className="bg-white shadow-md">
       {/* HEADER */}
       <div className="px-3 py-4 flex items-center justify-between">
         <div className="pl-5">
@@ -19,9 +36,17 @@ export default function Header() {
 
         {/* NAVIGATIONS */}
         <div className="flex items-center space-between gap-x-5">
-          <Link href="/">Questions</Link>
-          <Link href="/">Results</Link>
-          <Link href="/">Leaderboard</Link>
+          {paths.map((path) => (
+            <Link
+              key={path.path}
+              href={path.path}
+              className={`transition-all duration-200 hover:text-blue-500 ${
+                pathname === path.path ? "border-b-2 border-blue-500" : ""
+              }`}
+            >
+              {path.name}
+            </Link>
+          ))}
         </div>
 
         {/* USER DATA AND PROFILE */}
