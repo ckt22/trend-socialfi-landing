@@ -31,7 +31,7 @@ export default function Header() {
       {/* HEADER */}
       <div className="px-3 py-4 flex items-center justify-between">
         <div className="pl-5">
-          <Image src="/brt-logo.jpeg" height={35} width={120} alt="logo" />
+          <Image src="/shines_logo.png" height={35} width={120} alt="logo" />
         </div>
 
         {/* NAVIGATIONS */}
